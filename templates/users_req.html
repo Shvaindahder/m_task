@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Заявки пользователей</title>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+
+    <div id="user-request-block">
+        {% for request in requests %}
+        <div class="wrap">
+            <div class="user-request" id="{{ request.id }}">
+                <div class="user-request__username">
+                    Имя: {{ request.username }}
+                </div>
+                <div class="user-request__phone">
+                    Номер телефона: {{ request.phone }}
+                </div>
+                <div class="user-request__date">
+                    Дата заявки: {{ request.date_of_request.day }}:{{ request.date_of_request.month }}:{{ request.date_of_request.year }}
+                </div>
+            </div>
+            <div class="decline">
+                <button type="button" class="btn btn-danger">Отклонить</button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <!-- <table>
+        <tr><th>Имя пользователя</th><th>Номер телефона</th></tr>
+        <tr>
+        {% for request in requests %}
+            <td>{{ request.username }}</td><td>{{ request.phone }}</td>
+
+
+    {% endfor %}
+    </tr></table> -->
+</div>
+
+
+<style>
+    #user-request-block {
+        width: 80%;
+        height: 100%;
+        margin-top: 20px;
+    }
+
+    .wrap {
+        border: 1px solid black;
+        margin-bottom: 20px;
+    }
+
+    .user-request {
+        display: inline-block;
+        width: 75%;
+        padding: 10px 20px;
+    }
+    .decline {
+        display: inline-block;
+        width: 20%;
+        height: 100%;
+    }
+    
+    .non-vizible {
+        display: none;
+    }
+</style>
+
+<script>
+    let wrap = document.getElementsByClassName("wrap")
+    for (let element of wrap) {
+        let request = element.getElementsByClassName("user-request")[0]
+        let button = element.getElementsByClassName("btn")[0];
+        console.log(button)
+        let request_id = request.id;
+        button.onclick = () => {
+            fetch("{{ url_for('admin.decline') }}", {
+                method: "POST", 
+                body: JSON.stringify({request_id: request_id})
+            })
+            .then(data => data.json())
+            .then(data => {
+                if (data.status === "success") {
+                    element.classList.add("non-vizible");
+                }
+            })
+        }
+    }
+</script>
+{% endblock %}
